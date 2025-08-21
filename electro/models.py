@@ -23,6 +23,10 @@ class Supplier(models.Model):
 
         :param amount: Сумма, на которую уменьшается задолженность.
         """
+        if amount > self.debt:
+            raise ValueError(
+                "Сумма уменьшения задолженности превышает текущую задолженность."
+            )
         self.debt -= amount
         self.save()
 
@@ -40,6 +44,9 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     model = models.CharField(max_length=255)
     release_date = models.DateField()
+
+    def __str__(self):
+        return self.name
 
 
 class NetworkNode(models.Model):
@@ -64,12 +71,12 @@ class NetworkNode(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="nodes")
     product_name = models.CharField(max_length=255)
     product_model = models.CharField(max_length=255)
-    product_release_date = models.DateField()
+    product_release_date = models.DateField(null=True, blank=True)
     supplier = models.ForeignKey(
         Supplier, on_delete=models.CASCADE, related_name="nodes"
     )
     debt = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    level = models.IntegerField(choices=LEVEL_CHOICES)
+    level = models.IntegerField(choices=LEVEL_CHOICES, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

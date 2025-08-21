@@ -1,9 +1,11 @@
-from django_filters import rest_framework as filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+
 
 from users.permission import IsActiveEmployee
+from .filters import NetworkNodeFilter
 
 from .models import NetworkNode, Payment, Product, Supplier
 from .serializers import (NetworkNodeSerializer, PaymentSerializer,
@@ -28,29 +30,44 @@ class SupplierViewSet(viewsets.ModelViewSet):
         """
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
 
         # Удаляем поле 'debt' из данных, чтобы оно не обновлялось
         request.data.pop("debt", None)
 
-        serializer.is_valid(raise_exception=True)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+
+        # Проверка валидности данных
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response({"errors": e.detail}, status=400)
+
         self.perform_update(serializer)
         return Response(serializer.data)
 
 
-class NetworkNodeFilter(filters.FilterSet):
+class ProductViewSet(viewsets.ModelViewSet):
     """
-    Фильтр для узлов сети.
+    Вьюсет для управления продуктами.
 
-    Позволяет фильтровать узлы сети по стране и городу.
+    Позволяет выполнять операции CRUD (создание, чтение, обновление, удаление) для модели Product.
     """
 
-    country = filters.CharFilter(field_name="country", lookup_expr="icontains")
-    city = filters.CharFilter(field_name="city", lookup_expr="icontains")
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsActiveEmployee]
 
-    class Meta:
-        model = NetworkNode
-        fields = ["country", "city"]
+    def perform_create(self, serializer):
+        """
+        Дополнительная логика при создании продукта (если необходимо).
+        """
+        serializer.save()
+
+    def perform_update(self, serializer):
+        """
+        Дополнительная логика при обновлении продукта (если необходимо).
+        """
+        serializer.save()
 
 
 class NetworkNodeViewSet(viewsets.ModelViewSet):
@@ -76,18 +93,6 @@ class NetworkNodeViewSet(viewsets.ModelViewSet):
             node.save()
             return Response({"status": "Задолженность очищена"})
         return Response({"status": "Задолженность уже равна нулю"}, status=400)
-
-
-class ProductViewSet(viewsets.ModelViewSet):
-    """
-    Вьюсет для управления продуктами.
-
-    Позволяет выполнять операции CRUD (создание, чтение, обновление, удаление) для модели Product.
-    """
-
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsActiveEmployee]
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
