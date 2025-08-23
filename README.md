@@ -110,6 +110,7 @@ API предоставляет следующие конечные точки:
 Команды запускающие тестирование:
 - coverage run manage.py test electro.tests
 - coverage run manage.py test users.tests
+
 Просмотреть покрытие можно кодом:
 - coverage report
 
