@@ -109,4 +109,4 @@ class Payment(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Payment of {self.amount} on {self.payment_date.strftime('%Y-%m-%d')}"
+        return f"Платеж на сумму {self.amount} от {self.payment_date.strftime('%Y-%m-%d')}"

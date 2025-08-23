@@ -29,6 +29,13 @@ class SupplierSerializer(serializers.ModelSerializer):
         if self.instance is None:  # Проверяем, если это новый объект
             if Supplier.objects.filter(email=value).exists():
                 raise serializers.ValidationError("Этот email уже используется.")
+        else:  # Если это обновление существующего объекта
+            if (
+                Supplier.objects.filter(email=value)
+                .exclude(id=self.instance.id)
+                .exists()
+            ):
+                raise serializers.ValidationError("Этот email уже используется.")
         return value
 
 
