@@ -65,40 +65,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     такие как номер телефона, город и аватар.
     """
 
-    username = models.CharField(max_length=150, unique=True, default="default_username")
-    email = models.EmailField(
-        unique=True,
-        verbose_name="Email",
-        help_text="Введите ваш адрес электронной почты"
-    )
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True, verbose_name="Email")
     phone = models.CharField(
-        max_length=15,
-        blank=True,
-        null=True,
-        verbose_name="Телефон",
-        help_text="Введите ваш номер телефона",
+        max_length=15, blank=True, null=True, verbose_name="Телефон"
     )
-    city = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        verbose_name="Город",
-        help_text="Введите ваш город",
-    )
+    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Город")
     avatar = models.ImageField(
-        upload_to="avatars/",
-        blank=True,
-        null=True,
-        verbose_name="Фото",
-        help_text="Загрузите фото",
+        upload_to="avatars/", blank=True, null=True, verbose_name="Фото"
     )
 
-    is_active = models.BooleanField(
-        default=True
-    )
-    is_staff = models.BooleanField(
-        default=False
-    )
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
