@@ -111,7 +111,7 @@ API предоставляет следующие конечные точки:
 - coverage run manage.py test electro.tests
 - coverage run manage.py test users.tests
 
-Просмотреть покрытие можно кодом:
+Просмотреть покрытие, можно кодом:
 - coverage report
 
 ### Процент покрытия тестами
